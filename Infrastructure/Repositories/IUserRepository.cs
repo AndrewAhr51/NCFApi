@@ -10,5 +10,6 @@ namespace NCFApi.Infrastructure.Repositories
         Task<User?> GetByUsernameAsync(string username);  // ✅ Retrieve a user by username
         Task<bool> UpdateAsync(User user);  // ✅ Update user details
         Task<bool> DeleteAsync(int id);  // ✅ Remove a user by ID
+        Task<int> GetRoleIdAsync(string role);  // ✅ Retrieve role ID by role name
     }
 }

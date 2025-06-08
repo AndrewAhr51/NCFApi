@@ -50,5 +50,14 @@ namespace NCFApi.Infrastructure.Repositories
             _context.Users.Remove(user);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        // ✅ Retrieve role ID by role name
+        public async Task<int> GetRoleIdAsync(string role)
+        {
+            return await _context.Roles
+                .Where(r => r.Name == role)
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+        }
     }
 }
