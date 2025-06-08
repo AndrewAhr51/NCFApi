@@ -20,4 +20,8 @@
     <Folder Include="Saga\Orchestrators\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NCFCore\NCFCore.csproj" />
+  </ItemGroup>
+
 </Project>
