@@ -8,7 +8,7 @@ namespace NCFApi.Domain.Entities
         public required string Username { get; set; }  // Login Name
         public required string Email { get; set; }  // User Email
         public required string PasswordHash { get; set; }  // Hashed Password for Security
-        public required string Role { get; set; }  // User Role (Admin, Manager, Viewer)
+        public required int RoleId { get; set; }  // User Role (Admin, Manager, Viewer)
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;  // Timestamp for creation
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;  // Timestamp for updates
     }

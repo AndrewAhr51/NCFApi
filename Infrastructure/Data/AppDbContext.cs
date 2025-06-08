@@ -16,5 +16,6 @@ namespace NCFApi.Infrastructure.Data
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<Receipt> Receipts { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Roles> Roles { get; set; }
     }
 }
