@@ -1,0 +1,6 @@
+@NCFApi_HostAddress = http://localhost:5182
+
+GET {{NCFApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
