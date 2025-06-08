@@ -1,8 +1,7 @@
 ﻿namespace NCFApi.Domain.DTOs
 {
-    public class RolesDto
+    public class CreateRoleDto
     {
-        public required int RoleId { get; set; }
         public required string Name { get; set; }
         public required string Description { get; set; }
     }
