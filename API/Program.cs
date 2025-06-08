@@ -19,6 +19,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+// ✅ Register AuthService & UserService
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 // ✅ Register Repository & Service Layers
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 builder.Services.AddScoped<IDonorService, DonorService>();
@@ -55,12 +58,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// ✅ Run Database Initialization
-using (var scope = app.Services.CreateScope())
-{
-    DbInitializer.Initialize(scope.ServiceProvider);
-}
-
 // ✅ Configure Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -73,4 +70,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseMiddleware<RoleMiddleware>();
 app.Run();
