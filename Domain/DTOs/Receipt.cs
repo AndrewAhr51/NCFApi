@@ -3,9 +3,9 @@
     public class ReceiptDto
     {
         public int Id { get; set; }  // Unique Identifier
-        public int TransactionId { get; set; }  // Foreign Key referencing Transaction
-        public DateTime IssuedDate { get; set; }  // Timestamp of issuance
-        public string ReceiptNumber { get; set; }  // Unique identifier for the receipt
-        public string IssuedBy { get; set; }  // Name of the issuer or organization
+        public required int TransactionId { get; set; }  // Foreign Key referencing Transaction
+        public required DateTime IssuedDate { get; set; }  // Timestamp of issuance
+        public required string ReceiptNumber { get; set; }  // Unique identifier for the receipt
+        public required string IssuedBy { get; set; }  // Name of the issuer or organization
     }
 }

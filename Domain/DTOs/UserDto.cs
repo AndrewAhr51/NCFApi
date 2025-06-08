@@ -3,8 +3,8 @@
     public class UserDto
     {
         public int Id { get; set; }  // Unique Identifier
-        public string Username { get; set; }  // Login Name
-        public string Email { get; set; }  // User Email
-        public string Role { get; set; }  // User Role (Admin, Manager, Viewer)
+        public required string Username { get; set; }  // Login Name
+        public required string Email { get; set; }  // User Email
+        public required string Role { get; set; }  // User Role (Admin, Manager, Viewer)
     }
 }

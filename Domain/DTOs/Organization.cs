@@ -3,11 +3,11 @@
     public class OrganizationDto
     {
         public int Id { get; set; }  // Unique Identifier
-        public string Name { get; set; }  // Organization Name
-        public string ContactEmail { get; set; }  // Contact Email
-        public string PhoneNumber { get; set; }  // Contact Phone
-        public string Address { get; set; }  // Physical Location
-        public DateTime CreatedAt { get; set; }  // Timestamp for creation
-        public DateTime UpdatedAt { get; set; }  // Timestamp for updates
+        public required string Name { get; set; }  // Organization Name
+        public required string ContactEmail { get; set; }  // Contact Email
+        public required string PhoneNumber { get; set; }  // Contact Phone
+        public required string Address { get; set; }  // Physical Location
+        public required DateTime CreatedAt { get; set; }  // Timestamp for creation
+        public required DateTime UpdatedAt { get; set; }  // Timestamp for updates
     }
 }

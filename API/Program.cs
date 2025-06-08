@@ -1,27 +1,48 @@
-﻿using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Extensions.DurableTask;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.DurableTask.Client;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using NCFApi.Infrastructure;
-using NCFApi.Infrastructure.Repositories;
+using Microsoft.IdentityModel.Tokens;
 using NCFApi.Application.Services;
+using NCFApi.Infrastructure;
 using NCFApi.Infrastructure.Data;
+using NCFApi.Infrastructure.Repositories;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Configure SQL Server Database Context with Proper Options
+// ✅ Configure SQL Server Database Context
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("NCFConnection"),
         sqlOptions => sqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-// ✅ Register Repository & Service Layers with Scoped Lifetime
+// ✅ Register UserRepository & UserService
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// ✅ Register Repository & Service Layers
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 builder.Services.AddScoped<IDonorService, DonorService>();
+
+// ✅ Configure JWT Authentication
+var jwtKey = builder.Configuration["JwtSettings:SecretKey"];
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) // Fix: Ensure JwtBearerDefaults is recognized
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = true;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
+
+//builder.Services.AddAuthorization();
 
 // ✅ Add Azure Durable Functions Support
 builder.Services.AddDurableTaskClient();
@@ -47,7 +68,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// ✅ Enable Authentication Middleware
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
