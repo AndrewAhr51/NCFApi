@@ -29,6 +29,6 @@ namespace NCFApi.Domain.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;  // Timestamp for updates
 
         // ✅ Optional: Link Donations to Donors
-        public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public ICollection<Donation> Transactions { get; set; } = new List<Donation>();
     }
 }
