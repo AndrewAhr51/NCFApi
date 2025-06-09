@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NCFApi.Domain.Entities
 {
     public class Donor
     {
+        [Key] // ✅ Explicitly define primary key
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }  // Unique Identifier
         public required int UserId { get; set; }  // Links donor to a user
         public required string FirstName { get; set; }

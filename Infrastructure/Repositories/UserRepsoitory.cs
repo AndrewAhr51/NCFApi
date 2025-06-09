@@ -56,7 +56,7 @@ namespace NCFApi.Infrastructure.Repositories
         {
             return await _context.Roles
                 .Where(r => r.Name == role)
-                .Select(r => r.Id)
+                .Select(r => r.RoleId)
                 .FirstOrDefaultAsync();
         }
     }

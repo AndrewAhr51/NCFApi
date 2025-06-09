@@ -23,9 +23,9 @@ VALUES
 GO
 
 -- ✅ Assign Permissions to Roles (Optimized Bulk Insert)
-INSERT INTO RolePermissions (RoleId, PermissionId)
+INSERT INTO RolePermissions (RolePermissionId, PermissionId)
 SELECT 
-    R.Id, P.Id
+    R.RoleId, P.PermissionId
 FROM Roles R
 JOIN Permissions P 
     ON (R.Name = 'Admin' AND P.Name IN ('ManageUsers', 'ViewReports', 'EditData', 'DeleteRecords', 'ManageSettings'))
@@ -39,11 +39,11 @@ GO
 -- ✅ Insert Sample Users (Bulk Insert)
 INSERT INTO Users (Username, PasswordHash, Email, RoleId, CreatedAt, UpdatedAt)
 VALUES 
-    ('admin', 'hashed_password_here', 'admin@nfc.com', (SELECT Id FROM Roles WHERE Name = 'Admin'), GETDATE(), GETDATE()),
-    ('manager', 'hashed_password_here', 'manager@nfc.com', (SELECT Id FROM Roles WHERE Name = 'Manager'), GETDATE(), GETDATE()),
-    ('viewer', 'hashed_password_here', 'viewer@nfc.com', (SELECT Id FROM Roles WHERE Name = 'Viewer'), GETDATE(), GETDATE()),
-    ('johndoe1', 'hashed_password_here', 'john.doe@example.com', (SELECT Id FROM Roles WHERE Name = 'Donor'), GETDATE(), GETDATE()),
-    ('janesmith1', 'hashed_password_here', 'jane.smith@example.com', (SELECT Id FROM Roles WHERE Name = 'Donor'), GETDATE(), GETDATE());
+    ('admin', 'hashed_password_here', 'admin@nfc.com', (SELECT RoleId FROM Roles WHERE Name = 'Admin'), GETDATE(), GETDATE()),
+    ('manager', 'hashed_password_here', 'manager@nfc.com', (SELECT RoleId FROM Roles WHERE Name = 'Manager'), GETDATE(), GETDATE()),
+    ('viewer', 'hashed_password_here', 'viewer@nfc.com', (SELECT RoleId FROM Roles WHERE Name = 'Viewer'), GETDATE(), GETDATE()),
+    ('johndoe1', 'hashed_password_here', 'john.doe@example.com', (SELECT RoleId FROM Roles WHERE Name = 'Donor'), GETDATE(), GETDATE()),
+    ('janesmith1', 'hashed_password_here', 'jane.smith@example.com', (SELECT RoleId FROM Roles WHERE Name = 'Donor'), GETDATE(), GETDATE());
 GO
 
 

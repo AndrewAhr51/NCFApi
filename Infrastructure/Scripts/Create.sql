@@ -5,7 +5,7 @@ GO
 
 -- 🔹 Create Roles Table
 CREATE TABLE Roles (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+    RoleId INT PRIMARY KEY IDENTITY(1,1),
     Name NVARCHAR(50) NOT NULL UNIQUE,
     Description NVARCHAR(255) NULL
 );
@@ -13,7 +13,7 @@ GO
 
 -- 🔹 Create Permissions Table
 CREATE TABLE Permissions (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+    PermissionId INT PRIMARY KEY IDENTITY(1,1),
     Name NVARCHAR(100) NOT NULL UNIQUE,
     Description NVARCHAR(255) NULL
 );
@@ -21,11 +21,11 @@ GO
 
 -- 🔹 Create RolePermissions Table
 CREATE TABLE RolePermissions (
-    RoleId INT NOT NULL,
+    RolePermissionId INT NOT NULL,
     PermissionId INT NOT NULL,
-    PRIMARY KEY (RoleId, PermissionId),
-    FOREIGN KEY (RoleId) REFERENCES Roles(Id) ON DELETE CASCADE,
-    FOREIGN KEY (PermissionId) REFERENCES Permissions(Id) ON DELETE CASCADE
+    PRIMARY KEY (RolePermissionId, PermissionId),
+    FOREIGN KEY (RolePermissionId) REFERENCES Roles(RoleId) ON DELETE CASCADE,
+    FOREIGN KEY (PermissionId) REFERENCES Permissions(PermissionId) ON DELETE CASCADE
 );
 GO
 
@@ -38,7 +38,7 @@ CREATE TABLE Users (
     RoleId INT NOT NULL,
     CreatedAt DATETIME DEFAULT GETUTCDATE(),
     UpdatedAt DATETIME DEFAULT GETUTCDATE(),
-    FOREIGN KEY (RoleId) REFERENCES Roles(Id) ON DELETE CASCADE
+    FOREIGN KEY (RoleId) REFERENCES Roles(RoleId) ON DELETE CASCADE
 );
 GO
 
@@ -49,7 +49,7 @@ CREATE TABLE SystemUsers (
     Email NVARCHAR(255),
     PasswordHash NVARCHAR(255),
     RoleId INT,
-    FOREIGN KEY (RoleId) REFERENCES Roles(Id)
+    FOREIGN KEY (RoleId) REFERENCES Roles(RoleId)
 );
 GO
 

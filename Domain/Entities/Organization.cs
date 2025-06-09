@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NCFApi.Domain.Entities
 {
     public class Organization
     {
-        public int Id { get; set; }  // Unique Identifier
+
+        [Key] // ✅ Explicitly define primary key
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] public int Id { get; set; }  // Unique Identifier
         public required string Name { get; set; }  // Organization Name
         public required string ContactEmail { get; set; }  // Contact Email
         public required string PhoneNumber { get; set; }  // Contact Phone

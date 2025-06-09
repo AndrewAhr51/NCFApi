@@ -1,10 +1,13 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NCFApi.Domain.Entities
 {
     public class Transaction
     {
-        public int Id { get; set; }  // Unique Identifier
+        [Key] // ✅ Explicitly define primary key
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] public int Id { get; set; }  // Unique Identifier
         public required int DonorId { get; set; }  // Foreign Key referencing Donor
         public required decimal Amount { get; set; }  // Donation Amount
         public required DateTime TransactionDate { get; set; } = DateTime.UtcNow;  // Timestamp

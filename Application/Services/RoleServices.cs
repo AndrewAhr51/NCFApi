@@ -26,7 +26,7 @@ namespace NCFApi.Application.Services
             };
 
             var createdRole = await _roleRepository.AddAsync(newRole);
-            return new RolesDto { RoleId = createdRole.Id, Name = createdRole.Name, Description = createdRole.Description };
+            return new RolesDto { RoleId = createdRole.RoleId, Name = createdRole.Name, Description = createdRole.Description };
         }
 
         // ✅ Get a role by ID
@@ -34,7 +34,7 @@ namespace NCFApi.Application.Services
         {
             var role = await _roleRepository.GetByIdAsync(id);
             if (role == null) return null;
-            return new RolesDto { RoleId = role.Id, Name = role.Name, Description = role.Description };
+            return new RolesDto { RoleId = role.RoleId, Name = role.Name, Description = role.Description };
         }
 
         // ✅ Update role details

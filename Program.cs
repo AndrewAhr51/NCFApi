@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.DurableTask.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NCFApi.Application.Configurations;
 using NCFApi.Application.Services;
-using NCFApi.Infrastructure;
 using NCFApi.Infrastructure.Data;
 using NCFApi.Infrastructure.Repositories;
 using System.Security.Cryptography;
@@ -20,7 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         sqlOptions => sqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
     ));
 
-// ✅ Register Repositories & Services
+// ✅ Register Repositories & Services (Removed Duplicate UserRepository & UserService)
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -28,11 +26,8 @@ builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 builder.Services.AddScoped<IDonorService, DonorService>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
 builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
-
 
 builder.Services.AddControllers();
 
@@ -80,18 +75,21 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ViewerPolicy", policy => policy.RequireRole("Viewer"));
 });
 
+// ✅ Log Configuration Sections
 foreach (var section in builder.Configuration.GetChildren())
 {
-    Console.WriteLine($"Found Configuration Section: {section.Key}");
+    Console.WriteLine($"🔹 Found Configuration Section: {section.Key}");
 }
 
-//// ✅ Conditional Azure Durable Functions Support
-//var hostEndpoint = builder.Configuration["AzureFunctionSettings:Worker:HostEndpoint"];
-//if (!string.IsNullOrEmpty(hostEndpoint))
-//{
-//    builder.Services.AddDurableTaskClient();
-//    builder.Services.AddFunctionsWorkerDefaults();
-//}
+// ✅ Conditional Azure Durable Functions Support (Uncomment if Needed)
+/*
+var hostEndpoint = builder.Configuration["AzureFunctionSettings:Worker:HostEndpoint"];
+if (!string.IsNullOrEmpty(hostEndpoint))
+{
+    builder.Services.AddDurableTaskClient();
+    builder.Services.AddFunctionsWorkerDefaults();
+}
+*/
 
 // ✅ Add Controllers & API Documentation (Swagger)
 builder.Services.AddControllers();
@@ -110,11 +108,8 @@ if (app.Environment.IsDevelopment())
 // ✅ Enable Authentication Middleware
 app.UseHttpsRedirection();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseAuthentication();
-    app.UseAuthorization();
-}
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseMiddleware<RoleMiddleware>();
 

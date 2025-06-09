@@ -25,7 +25,7 @@ namespace NCFApi.API.Controllers
                 return BadRequest("Invalid user data.");
 
             var createdUser = await _userService.CreateUserAsync(userDto);
-            return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+            return CreatedAtAction(nameof(GetUserById), new { id = createdUser.UserId }, createdUser);
         }
 
         // ✅ Get a user by ID

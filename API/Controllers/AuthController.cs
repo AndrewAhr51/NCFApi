@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NCFApi.Application.DTOs;
 using NCFApi.Application.Services;
+using NCFApi.Domain.DTOs;
+using System.Threading.Tasks;
 
 [Route("api/auth")]
 [ApiController]
@@ -14,12 +15,16 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+    public async Task<IActionResult> Login([FromBody] LoginDto request)
     {
-        var token = await _authService.AuthenticateAsync(loginDto);
-        if (token == null)
-            return Unauthorized("Invalid username or password.");
+        var token = await _authService.AuthenticateAsync(request);
+        return token != null ? Ok(new { Token = token }) : Unauthorized();
+    }
 
-        return Ok(new { Token = token });
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        var newToken = await _authService.RefreshTokenAsync(request.ExpiredToken);
+        return newToken != null ? Ok(new { Token = newToken }) : Unauthorized();
     }
 }

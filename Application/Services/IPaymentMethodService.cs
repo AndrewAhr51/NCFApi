@@ -1,5 +1,4 @@
-﻿using NCFApi.Application.DTOs;
-using NCFApi.Domain.DTOs;
+﻿using NCFApi.Domain.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
