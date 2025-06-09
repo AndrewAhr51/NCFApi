@@ -1,115 +1,67 @@
-﻿USE [NCFDonorDb]
+﻿USE [NCFDonorDb];
 GO
 
--- ✅ Seed Roles (Bulk Insert)
-INSERT INTO Roles (Name, Description)
-VALUES 
-    ('Admin', 'Full access to manage users, permissions, and system settings'),
-    ('Manager', 'Can oversee projects, manage teams, and view analytics'),
-    ('Viewer', 'Can view reports and dashboards, but cannot modify data'),
-    ('Donor', 'Can edit only their profile and make donations');
+-- 🔹 Insert Roles
+INSERT INTO Roles (Name, Description) VALUES 
+('Admin', 'Administrator with full access'),
+('Donor', 'User who donates funds'),
+('Organization Manager', 'Manages charitable organizations');
 GO
 
--- ✅ Seed Permissions (Bulk Insert)
-INSERT INTO Permissions (Name, Description)
-VALUES 
-    ('ManageUsers', 'Can create, update, and delete user accounts'),
-    ('ViewReports', 'Can view analytics and reports'),
-    ('EditData', 'Can modify existing records'),
-    ('DeleteRecords', 'Can remove records from the system'),
-    ('ManageSettings', 'Can update system configurations and settings'),
-    ('EditOwnProfile', 'Allows donors to update only their own information'),
-    ('MakeDonation', 'Allows donors to make financial contributions');
+-- 🔹 Insert Permissions
+INSERT INTO Permissions (Name, Description) VALUES 
+('CreateUser', 'Allows creation of users'),
+('ManageDonations', 'Can process and manage donations'),
+('ViewReports', 'Can access financial reports');
 GO
 
--- ✅ Assign Permissions to Roles (Optimized Bulk Insert)
-INSERT INTO RolePermissions (RolePermissionId, PermissionId)
-SELECT 
-    R.RoleId, P.PermissionId
-FROM Roles R
-JOIN Permissions P 
-    ON (R.Name = 'Admin' AND P.Name IN ('ManageUsers', 'ViewReports', 'EditData', 'DeleteRecords', 'ManageSettings'))
-    OR (R.Name = 'Manager' AND P.Name IN ('ViewReports', 'EditData'))
-    OR (R.Name = 'Viewer' AND P.Name = 'ViewReports')
-    OR (R.Name = 'Donor' AND P.Name IN ('EditOwnProfile', 'MakeDonation'))
-WHERE EXISTS (SELECT 1 FROM Roles WHERE Roles.Name = R.Name)
-AND EXISTS (SELECT 1 FROM Permissions WHERE Permissions.Name = P.Name);
+-- 🔹 Insert Role-Permission Assignments
+INSERT INTO RolePermissions (RolePermissionId, PermissionId) VALUES 
+(1, 1), (1, 2), (1, 3), -- Admin
+(2, 2), -- Donor
+(3, 2), (3, 3); -- Organization Manager
 GO
 
--- ✅ Insert Sample Users (Bulk Insert)
-INSERT INTO Users (Username, PasswordHash, Email, RoleId, CreatedAt, UpdatedAt)
-VALUES 
-    ('admin', 'hashed_password_here', 'admin@nfc.com', (SELECT RoleId FROM Roles WHERE Name = 'Admin'), GETDATE(), GETDATE()),
-    ('manager', 'hashed_password_here', 'manager@nfc.com', (SELECT RoleId FROM Roles WHERE Name = 'Manager'), GETDATE(), GETDATE()),
-    ('viewer', 'hashed_password_here', 'viewer@nfc.com', (SELECT RoleId FROM Roles WHERE Name = 'Viewer'), GETDATE(), GETDATE()),
-    ('johndoe1', 'hashed_password_here', 'john.doe@example.com', (SELECT RoleId FROM Roles WHERE Name = 'Donor'), GETDATE(), GETDATE()),
-    ('janesmith1', 'hashed_password_here', 'jane.smith@example.com', (SELECT RoleId FROM Roles WHERE Name = 'Donor'), GETDATE(), GETDATE());
+-- 🔹 Insert Users
+INSERT INTO Users (Username, Email, PasswordHash, RoleId) VALUES 
+('admin1', 'admin@ncfdonor.org', 'hashedpassword123', 1),
+('donor1', 'donor1@example.com', 'hashedpassword456', 2),
+('manager1', 'manager1@charity.org', 'hashedpassword789', 3);
 GO
 
-
--- ✅ Insert Sample Donors (Bulk Insert)
-INSERT INTO Donors (UserId, FirstName, LastName, Email, PhoneNumber, StreetAddressLine1, StreetAddressLine2, City, State, PostalCode, Country, DateOfBirth, CreatedAt, UpdatedAt)
-SELECT 
-    U.UserId, 'John', 'Doe', 'john.doe@example.com', '123-456-7890', '123 Main St', 'Apt 4B', 'New York', 'NY', '10001', 'USA', '1985-07-10', GETDATE(), GETDATE()
-FROM Users U WHERE U.Username = 'johndoe1'
-UNION ALL
-SELECT 
-    U.UserId, 'Jane', 'Smith', 'jane.smith@example.com', '987-654-3210', '456 Elm St', NULL, 'Los Angeles', 'CA', '90001', 'USA', '1990-05-25', GETDATE(), GETDATE()
-FROM Users U WHERE U.Username = 'janesmith1';
+-- 🔹 Insert Charitable Organizations
+INSERT INTO CharitableOrganizations (Name, Description, RegistrationNumber, Website, ContactEmail, ContactPhone, Address, City, State, Country, PostalCode, FoundedYear, TotalDonations, IsActive) VALUES 
+('Helping Hands', 'Provides food and shelter for those in need', 'HH12345', 'https://helpinghands.org', 'info@helpinghands.org', '123-456-7890', '123 Charity St', 'New York', 'NY', 'USA', '10001', 2005, 50000, 1),
+('Education First', 'Improving education access for underprivileged children', 'EF67890', 'https://educationfirst.org', 'contact@educationfirst.org', '987-654-3210', '456 Education Rd', 'San Francisco', 'CA', 'USA', '94105', 2010, 75000, 1);
 GO
 
--- ✅ Insert Sample Transactions (Efficient References)
-INSERT INTO Transactions (DonorId, Amount, PaymentMethod, Status, ReferenceNumber, TransactionDate)
-SELECT DonorId, 100.00, 'Credit Card', 'Completed', 'TXN1001', GETDATE()
-FROM Donors WHERE Email = 'john.doe@example.com'
-UNION ALL
-SELECT DonorId, 50.00, 'PayPal', 'Completed', 'TXN1002', GETDATE()
-FROM Donors WHERE Email = 'jane.smith@example.com';
+-- 🔹 Insert Donors
+INSERT INTO Donors (UserId, FirstName, LastName, Email, PhoneNumber, StreetAddressLine1, City, State, PostalCode, Country, DateOfBirth) VALUES 
+(2, 'John', 'Doe', 'john.doe@example.com', '555-111-2222', '789 Giving Ln', 'Los Angeles', 'CA', '90001', 'USA', '1985-06-15'),
+(2, 'Jane', 'Smith', 'jane.smith@example.com', '555-333-4444', '321 Care Ave', 'Seattle', 'WA', '98101', 'USA', '1990-09-23');
 GO
 
--- ✅ Insert Sample Campaigns
-INSERT INTO Campaigns (Name, StartDate, EndDate)
-VALUES 
-    ('Disaster Relief Fund', '2025-01-01', '2025-12-31'),
-    ('Education Support Program', '2025-03-01', '2025-08-31');
+-- 🔹 Insert Donations
+INSERT INTO Donations (DonorId, OrganizationId, Amount, PaymentMethod, TransactionReference, Status) VALUES 
+(1, 1, 100.00, 'Credit Card', 'TXN001', 'Completed'),
+(2, 2, 50.00, 'PayPal', 'TXN002', 'Pending');
 GO
 
--- ✅ Insert Sample Organizations
-INSERT INTO Organizations (Name, ContactEmail)
-VALUES 
-    ('Global Aid Foundation', 'contact@gaf.org'),
-    ('Education First Initiative', 'support@educationfirst.org');
+-- 🔹 Insert Payment Methods
+INSERT INTO PaymentMethods (MethodName, Description, IsActive) VALUES 
+('Credit Card', 'Payment via credit card', 1),
+('PayPal', 'Online payment via PayPal', 1);
 GO
 
--- ✅ Insert Sample Payment Methods (Optimized Format)
-INSERT INTO PaymentMethods (MethodName, Description, IsActive)
-VALUES 
-    ('Credit Card', 'Visa, Mastercard, Etc', 1),
-    ('Debit Card', 'Debit Card', 1),
-    ('PayPal', 'PayPal', 1),
-    ('Wire Transfer', 'Wire Transfer', 1),
-    ('Bank Transfer', 'Bank Transfer', 1),
-    ('Check', 'Check', 1),
-    ('Cryptocurrency', 'Cryptocurrency', 1),
-    ('Mobile Payment', 'Mobile Payment', 1);
+-- 🔹 Insert Receipt Statuses
+INSERT INTO ReceiptStatuses (StatusName, Description) VALUES 
+('Pending', 'Receipt is awaiting approval'),
+('Issued', 'Receipt has been issued'),
+('Cancelled', 'Receipt was cancelled');
 GO
 
--- ✅ Insert Sample Receipts
-INSERT INTO Receipts (TransactionId, IssuedDate, ReceiptNumber)
-SELECT Id, GETDATE(), 'RCP1001' FROM Transactions WHERE ReferenceNumber = 'TXN1001'
-UNION ALL
-SELECT Id, GETDATE(), 'RCP1002' FROM Transactions WHERE ReferenceNumber = 'TXN1002';
-GO
-
--- ✅ Verify Data
-SELECT * FROM Roles;
-SELECT * FROM Permissions;
-SELECT * FROM RolePermissions;
-SELECT * FROM Users;
-SELECT * FROM Donors;
-SELECT * FROM Transactions;
-SELECT * FROM Campaigns;
-SELECT * FROM Organizations;
-SELECT * FROM PaymentMethods;
-SELECT * FROM Receipts;
+-- 🔹 Insert Receipts
+INSERT INTO Receipts (DonationId, DonorId, OrganizationId, PaymentMethodId, StatusId, ReceiptNumber, Amount) VALUES 
+(1, 1, 1, 1, 2, 'RCPT001', 100.00),
+(2, 2, 2, 2, 1, 'RCPT002', 50.00);
 GO
