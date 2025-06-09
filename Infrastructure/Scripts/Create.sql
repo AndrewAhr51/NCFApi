@@ -1,6 +1,8 @@
 ﻿USE [NCFDonorDb]
 GO
 
+-- ✅ Recreate tables safely in the correct order
+
 -- 🔹 Create Roles Table
 CREATE TABLE Roles (
     Id INT PRIMARY KEY IDENTITY(1,1),
@@ -59,12 +61,18 @@ CREATE TABLE Donors (
     LastName NVARCHAR(100) NOT NULL,
     Email NVARCHAR(255) UNIQUE NOT NULL,
     PhoneNumber NVARCHAR(20),
-    Address NVARCHAR(255),
+    StreetAddressLine1 NVARCHAR(255),  -- ✅ First street address line
+    StreetAddressLine2 NVARCHAR(255),  -- ✅ Second street address line
+    City NVARCHAR(100),
+    State NVARCHAR(100),
+    PostalCode NVARCHAR(20),
+    Country NVARCHAR(100),
     DateOfBirth DATE,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE
 );
+GO
 GO
 
 -- 🔹 Create Transactions Table

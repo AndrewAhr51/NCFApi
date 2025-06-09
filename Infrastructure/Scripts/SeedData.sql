@@ -45,13 +45,13 @@ VALUES
 GO
 
 -- ✅ Insert Sample Donors (Bulk Insert)
-INSERT INTO Donors (UserId, FirstName, LastName, Email, PhoneNumber, Address, DateOfBirth, CreatedAt, UpdatedAt)
+INSERT INTO Donors (UserId, FirstName, LastName, Email, PhoneNumber, StreetAddressLine1, StreetAddressLine2, City, State, PostalCode, Country, DateOfBirth, CreatedAt, UpdatedAt)
 SELECT 
-    U.UserId, 'John', 'Doe', 'john.doe@example.com', '123-456-7890', '123 Main St', '1985-07-10', GETDATE(), GETDATE()
+    U.UserId, 'John', 'Doe', 'john.doe@example.com', '123-456-7890', '123 Main St', 'Apt 4B', 'New York', 'NY', '10001', 'USA', '1985-07-10', GETDATE(), GETDATE()
 FROM Users U WHERE U.Username = 'admin'
 UNION ALL
 SELECT 
-    U.UserId, 'Jane', 'Smith', 'jane.smith@example.com', '987-654-3210', '456 Elm St', '1990-05-25', GETDATE(), GETDATE()
+    U.UserId, 'Jane', 'Smith', 'jane.smith@example.com', '987-654-3210', '456 Elm St', NULL, 'Los Angeles', 'CA', '90001', 'USA', '1990-05-25', GETDATE(), GETDATE()
 FROM Users U WHERE U.Username = 'manager';
 GO
 
