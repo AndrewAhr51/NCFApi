@@ -41,18 +41,21 @@ INSERT INTO Users (Username, PasswordHash, Email, RoleId, CreatedAt, UpdatedAt)
 VALUES 
     ('admin', 'hashed_password_here', 'admin@nfc.com', (SELECT Id FROM Roles WHERE Name = 'Admin'), GETDATE(), GETDATE()),
     ('manager', 'hashed_password_here', 'manager@nfc.com', (SELECT Id FROM Roles WHERE Name = 'Manager'), GETDATE(), GETDATE()),
-    ('viewer', 'hashed_password_here', 'viewer@nfc.com', (SELECT Id FROM Roles WHERE Name = 'Viewer'), GETDATE(), GETDATE());
+    ('viewer', 'hashed_password_here', 'viewer@nfc.com', (SELECT Id FROM Roles WHERE Name = 'Viewer'), GETDATE(), GETDATE()),
+    ('johndoe1', 'hashed_password_here', 'john.doe@example.com', (SELECT Id FROM Roles WHERE Name = 'Donor'), GETDATE(), GETDATE()),
+    ('janesmith1', 'hashed_password_here', 'jane.smith@example.com', (SELECT Id FROM Roles WHERE Name = 'Donor'), GETDATE(), GETDATE());
 GO
+
 
 -- ✅ Insert Sample Donors (Bulk Insert)
 INSERT INTO Donors (UserId, FirstName, LastName, Email, PhoneNumber, StreetAddressLine1, StreetAddressLine2, City, State, PostalCode, Country, DateOfBirth, CreatedAt, UpdatedAt)
 SELECT 
     U.UserId, 'John', 'Doe', 'john.doe@example.com', '123-456-7890', '123 Main St', 'Apt 4B', 'New York', 'NY', '10001', 'USA', '1985-07-10', GETDATE(), GETDATE()
-FROM Users U WHERE U.Username = 'admin'
+FROM Users U WHERE U.Username = 'johndoe1'
 UNION ALL
 SELECT 
     U.UserId, 'Jane', 'Smith', 'jane.smith@example.com', '987-654-3210', '456 Elm St', NULL, 'Los Angeles', 'CA', '90001', 'USA', '1990-05-25', GETDATE(), GETDATE()
-FROM Users U WHERE U.Username = 'manager';
+FROM Users U WHERE U.Username = 'janesmith1';
 GO
 
 -- ✅ Insert Sample Transactions (Efficient References)
