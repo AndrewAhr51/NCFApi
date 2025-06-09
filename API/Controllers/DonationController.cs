@@ -1,94 +1,65 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NCFApi.Domain.DTOs;
 using NCFApi.Domain.Entities;
 using NCFApi.Infrastructure.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NCFApi.API.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class DonationsController : ControllerBase
+namespace NCFApi.Controllers
 {
-    private readonly IDonationRepository _donationRepository;
-
-    public DonationsController(IDonationRepository donationRepository)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class DonationController : ControllerBase
     {
-        _donationRepository = donationRepository;
-    }
+        private readonly IDonationRepository _donationRepository;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<DonationDto>>> GetAllDonations()
-    {
-        var donations = await _donationRepository.GetAllAsync();
-        return Ok(donations);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<DonationDto>> GetDonationById(int id)
-    {
-        var donation = await _donationRepository.GetByIdAsync(id);
-        if (donation == null)
+        public DonationController(IDonationRepository donationRepository)
         {
-            return NotFound();
-        }
-        return Ok(donation);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult> CreateDonation([FromBody] DonationDto donationDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
+            _donationRepository = donationRepository;
         }
 
-        var donation = new Donation
+        // ✅ GET: api/donation/{id} → Fetch a single donation
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Donation>> GetDonationById(int id)
         {
-            DonorId = donationDto.DonorId,
-            OrganizationId = donationDto.OrganizationId,
-            Amount = donationDto.Amount,
-            DonationDate = donationDto.DonationDate,
-            PaymentMethod = donationDto.PaymentMethod,
-            DonationReference = donationDto.DonationReference,
-            Status = donationDto.Status,
-            Notes = donationDto.Notes
-        };
+            var donation = await _donationRepository.GetDonationByIdAsync(id);
+            if (donation == null)
+                return NotFound();
 
-        await _donationRepository.AddAsync(donation);
-        return CreatedAtAction(nameof(GetDonationById), new { id = donation.DonationId }, donation);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateDonation(int id, [FromBody] DonationDto donationDto)
-    {
-        var existingDonation = await _donationRepository.GetByIdAsync(id);
-        if (existingDonation == null)
-        {
-            return NotFound();
+            return Ok(donation);
         }
 
-        existingDonation.Amount = donationDto.Amount;
-        existingDonation.PaymentMethod = donationDto.PaymentMethod;
-        existingDonation.Status = donationDto.Status;
-        existingDonation.DonationReference = donationDto.DonationReference;
-        existingDonation.Notes = donationDto.Notes;
-
-        await _donationRepository.UpdateAsync(existingDonation);
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteDonation(int id)
-    {
-        var donation = await _donationRepository.GetByIdAsync(id);
-        if (donation == null)
+        // ✅ GET: api/donation → Fetch all donations
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Donation>>> GetAllDonations()
         {
-            return NotFound();
+            return Ok(await _donationRepository.GetAllDonationsAsync());
         }
 
-        await _donationRepository.DeleteAsync(id);
-        return NoContent();
+        // ✅ POST: api/donation → Create a new donation
+        [HttpPost]
+        public async Task<ActionResult> AddDonation([FromBody] Donation donation)
+        {
+            await _donationRepository.AddDonationAsync(donation);
+            return CreatedAtAction(nameof(GetDonationById), new { id = donation.DonationId }, donation);
+        }
+
+        // ✅ PUT: api/donation/{id} → Update a donation
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateDonation(int id, [FromBody] Donation donation)
+        {
+            if (id != donation.DonationId)
+                return BadRequest();
+
+            await _donationRepository.UpdateDonationAsync(donation);
+            return NoContent();
+        }
+
+        // ✅ DELETE: api/donation/{id} → Delete a donation
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteDonation(int id)
+        {
+            await _donationRepository.DeleteDonationAsync(id);
+            return NoContent();
+        }
     }
 }

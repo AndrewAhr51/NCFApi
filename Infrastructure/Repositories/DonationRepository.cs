@@ -1,64 +1,50 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using NCFApi.Domain.Entities;
+using NCFApi.Infrastructure.Data;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace NCFApi.Infrastructure.Repositories;
-
-public class DonationRepository : IDonationRepository
+namespace NCFApi.Infrastructure.Repositories
 {
-    private readonly DbContext _context;
-
-    public DonationRepository(DbContext context)
+    public class DonationRepository : IDonationRepository
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
 
-    public async Task<IEnumerable<Donation>> GetAllAsync()
-    {
-        return await _context.Set<Donation>().ToListAsync();
-    }
-
-    public async Task<Donation> GetByIdAsync(int donationId)
-    {
-        return await _context.Set<Donation>().FindAsync(donationId);
-    }
-
-    public async Task<IEnumerable<Donation>> GetByDonorIdAsync(int donorId)
-    {
-        return await _context.Set<Donation>()
-                             .Where(d => d.DonorId == donorId)
-                             .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Donation>> GetByOrganizationIdAsync(int organizationId)
-    {
-        return await _context.Set<Donation>()
-                             .Where(d => d.OrganizationId == organizationId)
-                             .ToListAsync();
-    }
-
-    public async Task AddAsync(Donation donation)
-    {
-        await _context.Set<Donation>().AddAsync(donation);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateAsync(Donation donation)
-    {
-        _context.Set<Donation>().Update(donation);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(int donationId)
-    {
-        var donation = await GetByIdAsync(donationId);
-        if (donation != null)
+        public DonationRepository(AppDbContext context)
         {
-            _context.Set<Donation>().Remove(donation);
+            _context = context;
+        }
+
+        public async Task<Donation?> GetDonationByIdAsync(int id)
+        {
+            return await _context.Donations.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<Donation>> GetAllDonationsAsync()
+        {
+            return await _context.Donations.ToListAsync();
+        }
+
+        public async Task AddDonationAsync(Donation donation)
+        {
+            await _context.Donations.AddAsync(donation);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateDonationAsync(Donation donation)
+        {
+            _context.Donations.Update(donation);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteDonationAsync(int id)
+        {
+            var donation = await _context.Donations.FindAsync(id);
+            if (donation != null)
+            {
+                _context.Donations.Remove(donation);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

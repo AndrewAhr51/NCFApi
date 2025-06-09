@@ -15,36 +15,36 @@ namespace NCFApi.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Donor?> GetByIdAsync(int donorId)
+        public async Task<Donor?> GetDonorByIdAsync(int id)
         {
-            return await _context.Donors.FindAsync(donorId);
+            return await _context.Donors.FindAsync(id);
         }
 
-        public async Task<IEnumerable<Donor>> GetAllAsync()
+        public async Task<IEnumerable<Donor>> GetAllDonorsAsync()
         {
             return await _context.Donors.ToListAsync();
         }
 
-        public async Task<Donor> AddAsync(Donor donor)
+        public async Task AddDonorAsync(Donor donor)
         {
             await _context.Donors.AddAsync(donor);
             await _context.SaveChangesAsync();
-            return donor;
         }
 
-        public async Task<bool> UpdateAsync(Donor donor)
+        public async Task UpdateDonorAsync(Donor donor)
         {
             _context.Donors.Update(donor);
-            return await _context.SaveChangesAsync() > 0;
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteAsync(int donorId)
+        public async Task DeleteDonorAsync(int id)
         {
-            var donor = await _context.Donors.FindAsync(donorId);
-            if (donor == null) return false;
-
-            _context.Donors.Remove(donor);
-            return await _context.SaveChangesAsync() > 0;
+            var donor = await _context.Donors.FindAsync(id);
+            if (donor != null)
+            {
+                _context.Donors.Remove(donor);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

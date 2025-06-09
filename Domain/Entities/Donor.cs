@@ -9,7 +9,7 @@ namespace NCFApi.Domain.Entities
     {
         [Key] // ✅ Explicitly define primary key
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }  // Unique Identifier
+        public int DonerId { get; set; }  // Unique Identifier
         public required int UserId { get; set; }  // Links donor to a user
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
