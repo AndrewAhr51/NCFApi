@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NCFApi.Infrastructure.Repositories;
-
-public interface IReceiptRepository
+namespace NCFApi.Infrastructure.Repositories
 {
-    Task<IEnumerable<Receipt>> GetAllAsync();
-    Task<Receipt> GetByIdAsync(int receiptId);
-    Task AddAsync(Receipt receipt);
-    Task UpdateAsync(Receipt receipt);
-    Task DeleteAsync(int receiptId);
+    public interface IReceiptRepository
+    {
+        Task<Receipt?> GetReceiptByIdAsync(int id);
+        Task<IEnumerable<Receipt>> GetAllReceiptsAsync();
+        Task AddReceiptAsync(Receipt receipt);
+        Task UpdateReceiptAsync(Receipt receipt);
+        Task DeleteReceiptAsync(int id);
+    }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NCFApi.Domain.Entities;
-using NCFApi.Infrastructure.Repositories;
+using NCFApi.Application.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,18 +10,18 @@ namespace NCFApi.Controllers
     [ApiController]
     public class DonationController : ControllerBase
     {
-        private readonly IDonationRepository _donationRepository;
+        private readonly IDonationService _donationService;
 
-        public DonationController(IDonationRepository donationRepository)
+        public DonationController(IDonationService donationService)
         {
-            _donationRepository = donationRepository;
+            _donationService = donationService;
         }
 
         // ✅ GET: api/donation/{id} → Fetch a single donation
         [HttpGet("{id}")]
         public async Task<ActionResult<Donation>> GetDonationById(int id)
         {
-            var donation = await _donationRepository.GetDonationByIdAsync(id);
+            var donation = await _donationService.GetDonationByIdAsync(id);
             if (donation == null)
                 return NotFound();
 
@@ -32,14 +32,20 @@ namespace NCFApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Donation>>> GetAllDonations()
         {
-            return Ok(await _donationRepository.GetAllDonationsAsync());
+            return Ok(await _donationService.GetAllDonationsAsync());
         }
 
         // ✅ POST: api/donation → Create a new donation
         [HttpPost]
         public async Task<ActionResult> AddDonation([FromBody] Donation donation)
         {
-            await _donationRepository.AddDonationAsync(donation);
+            // Ensure nullable fields default to an empty string
+            donation.PaymentMethod ??= string.Empty;
+            donation.DonationReference ??= string.Empty;
+            donation.Status ??= string.Empty;
+            donation.Notes ??= string.Empty;
+
+            await _donationService.AddDonationAsync(donation);
             return CreatedAtAction(nameof(GetDonationById), new { id = donation.DonationId }, donation);
         }
 
@@ -50,7 +56,13 @@ namespace NCFApi.Controllers
             if (id != donation.DonationId)
                 return BadRequest();
 
-            await _donationRepository.UpdateDonationAsync(donation);
+            // Ensure nullable fields default to an empty string
+            donation.PaymentMethod ??= string.Empty;
+            donation.DonationReference ??= string.Empty;
+            donation.Status ??= string.Empty;
+            donation.Notes ??= string.Empty;
+
+            await _donationService.UpdateDonationAsync(donation);
             return NoContent();
         }
 
@@ -58,7 +70,7 @@ namespace NCFApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteDonation(int id)
         {
-            await _donationRepository.DeleteDonationAsync(id);
+            await _donationService.DeleteDonationAsync(id);
             return NoContent();
         }
     }

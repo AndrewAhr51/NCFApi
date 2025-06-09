@@ -1,76 +1,65 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
-using NCFApi.Domain.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using NCFApi.Domain.Entities;
 using NCFApi.Application.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NCFApi.API.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class CharitableOrganizationsController : ControllerBase
+namespace NCFApi.Controllers
 {
-    private readonly ICharitableOrganizationService _organizationService;
-
-    public CharitableOrganizationsController(ICharitableOrganizationService organizationService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CharitableOrganizationController : ControllerBase
     {
-        _organizationService = organizationService;
-    }
+        private readonly ICharitableOrganizationService _organizationService;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<CharitableOrganizationDto>>> GetAllOrganizations()
-    {
-        var organizations = await _organizationService.GetAllAsync();
-        return Ok(organizations);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<CharitableOrganizationDto>> GetOrganizationById(int id)
-    {
-        var organization = await _organizationService.GetByIdAsync(id);
-        if (organization == null)
+        public CharitableOrganizationController(ICharitableOrganizationService organizationService)
         {
-            return NotFound();
-        }
-        return Ok(organization);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult> CreateOrganization([FromBody] CharitableOrganizationDto organizationDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
+            _organizationService = organizationService;
         }
 
-        await _organizationService.AddAsync(organizationDto);
-        return CreatedAtAction(nameof(GetOrganizationById), new { id = organizationDto.OrganizationId }, organizationDto);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateOrganization(int id, [FromBody] CharitableOrganizationDto organizationDto)
-    {
-        var existingOrganization = await _organizationService.GetByIdAsync(id);
-        if (existingOrganization == null)
+        // ✅ GET: api/charitableorganization/{id} → Fetch a single organization
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CharitableOrganization>> GetOrganizationById(int id)
         {
-            return NotFound();
+            var organization = await _organizationService.GetOrganizationByIdAsync(id);
+            if (organization == null)
+                return NotFound();
+
+            return Ok(organization);
         }
 
-        await _organizationService.UpdateAsync(id, organizationDto);
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteOrganization(int id)
-    {
-        var organization = await _organizationService.GetByIdAsync(id);
-        if (organization == null)
+        // ✅ GET: api/charitableorganization → Fetch all organizations
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CharitableOrganization>>> GetAllOrganizations()
         {
-            return NotFound();
+            return Ok(await _organizationService.GetAllOrganizationsAsync());
         }
 
-        await _organizationService.DeleteAsync(id);
-        return NoContent();
+        // ✅ POST: api/charitableorganization → Create a new organization
+        [HttpPost]
+        public async Task<ActionResult> AddOrganization([FromBody] CharitableOrganization organization)
+        {
+            await _organizationService.AddOrganizationAsync(organization);
+            return CreatedAtAction(nameof(GetOrganizationById), new { id = organization.OrganizationId }, organization);
+        }
+
+        // ✅ PUT: api/charitableorganization/{id} → Update an organization
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateOrganization(int id, [FromBody] CharitableOrganization organization)
+        {
+            if (id != organization.OrganizationId)
+                return BadRequest();
+
+            await _organizationService.UpdateOrganizationAsync(organization);
+            return NoContent();
+        }
+
+        // ✅ DELETE: api/charitableorganization/{id} → Delete an organization
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteOrganization(int id)
+        {
+            await _organizationService.DeleteOrganizationAsync(id);
+            return NoContent();
+        }
     }
 }

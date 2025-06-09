@@ -41,13 +41,6 @@ namespace NCFApi.Domain.Entities
         public decimal Amount { get; set; }
 
         public string Notes { get; set; }
-
-        // Navigation Properties
-        public virtual Donation Donation { get; set; }
-        public virtual Donor Donor { get; set; }
-        public virtual CharitableOrganization CharitableOrganization { get; set; }
-        public virtual PaymentMethod PaymentMethod { get; set; }
-        public virtual ReceiptStatus ReceiptStatus { get; set; }
     }
 
 }

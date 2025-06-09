@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace NCFApi.Domain.DTOs;
 
@@ -9,8 +8,8 @@ public class PermissionsDto
 
     [Required]
     [StringLength(100)]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty; // ✅ Defaults to empty string
 
     [StringLength(255)]
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty; // ✅ Defaults to empty string
 }

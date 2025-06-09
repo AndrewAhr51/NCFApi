@@ -7,7 +7,6 @@ namespace NCFApi.Domain.Entities
     public class User
     {
         [Key] // ✅ Explicitly define primary key
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }  // Unique Identifier
         public required string Username { get; set; }  // Login Name
         public required string Email { get; set; }  // User Email

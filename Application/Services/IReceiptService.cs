@@ -1,13 +1,15 @@
-﻿using NCFApi.Domain.DTOs;
+﻿using NCFApi.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NCFApi.Application.Services;
-public interface IReceiptService
+namespace NCFApi.Application.Services
 {
-    Task<IEnumerable<ReceiptDto>> GetAllAsync();
-    Task<ReceiptDto> GetByIdAsync(int receiptId);
-    Task AddAsync(ReceiptDto receiptDto);
-    Task UpdateAsync(int receiptId, ReceiptDto receiptDto);
-    Task DeleteAsync(int receiptId);
+    public interface IReceiptService
+    {
+        Task<Receipt?> GetReceiptByIdAsync(int id);
+        Task<IEnumerable<Receipt>> GetAllReceiptsAsync();
+        Task AddReceiptAsync(Receipt receipt);
+        Task UpdateReceiptAsync(Receipt receipt);
+        Task DeleteReceiptAsync(int id);
+    }
 }

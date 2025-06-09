@@ -26,21 +26,16 @@ namespace NCFApi.Domain.Entities
 
         [Required]
         [StringLength(50)]
-        public string PaymentMethod { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty; // ✅ Defaults to empty string
 
         [Required]
         [StringLength(100)]
-        public string DonationReference { get; set; }
+        public string DonationReference { get; set; } = string.Empty; // ✅ Defaults to empty string
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-        public string Notes { get; set; }
-
-        // Navigation Properties
-        public virtual Donor Donor { get; set; }
-        public virtual CharitableOrganization CharitableOrganization { get; set; }
+        public string Notes { get; set; } = string.Empty; // ✅ Defaults to empty string
     }
-
 }

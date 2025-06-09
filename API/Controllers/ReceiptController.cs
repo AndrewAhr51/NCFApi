@@ -1,94 +1,65 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NCFApi.Domain.DTOs;
 using NCFApi.Domain.Entities;
-using NCFApi.Infrastructure.Repositories;
+using NCFApi.Application.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-
-namespace NCFApi.API.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class ReceiptsController : ControllerBase
+namespace NCFApi.Controllers
 {
-    private readonly IReceiptRepository _receiptRepository;
-
-    public ReceiptsController(IReceiptRepository receiptRepository)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ReceiptController : ControllerBase
     {
-        _receiptRepository = receiptRepository;
-    }
+        private readonly IReceiptService _receiptService;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ReceiptDto>>> GetAllReceipts()
-    {
-        var receipts = await _receiptRepository.GetAllAsync();
-        return Ok(receipts);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ReceiptDto>> GetReceiptById(int id)
-    {
-        var receipt = await _receiptRepository.GetByIdAsync(id);
-        if (receipt == null)
+        public ReceiptController(IReceiptService receiptService)
         {
-            return NotFound();
-        }
-        return Ok(receipt);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult> CreateReceipt([FromBody] ReceiptDto receiptDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
+            _receiptService = receiptService;
         }
 
-        var receipt = new Receipt
+        // ✅ GET: api/receipt/{id} → Fetch a single receipt
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Receipt>> GetReceiptById(int id)
         {
-            DonationId = receiptDto.DonationId,
-            DonorId = receiptDto.DonorId,
-            OrganizationId = receiptDto.OrganizationId,
-            PaymentMethodId = receiptDto.PaymentMethodId,
-            StatusId = receiptDto.StatusId,
-            IssuedDate = receiptDto.IssuedDate,
-            ReceiptNumber = receiptDto.ReceiptNumber,
-            Amount = receiptDto.Amount,
-            Notes = receiptDto.Notes
-        };
+            var receipt = await _receiptService.GetReceiptByIdAsync(id);
+            if (receipt == null)
+                return NotFound();
 
-        await _receiptRepository.AddAsync(receipt);
-        return CreatedAtAction(nameof(GetReceiptById), new { id = receipt.ReceiptId }, receipt);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateReceipt(int id, [FromBody] ReceiptDto receiptDto)
-    {
-        var existingReceipt = await _receiptRepository.GetByIdAsync(id);
-        if (existingReceipt == null)
-        {
-            return NotFound();
+            return Ok(receipt);
         }
 
-        existingReceipt.StatusId = receiptDto.StatusId;
-        existingReceipt.Notes = receiptDto.Notes;
-        existingReceipt.Amount = receiptDto.Amount;
-
-        await _receiptRepository.UpdateAsync(existingReceipt);
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteReceipt(int id)
-    {
-        var receipt = await _receiptRepository.GetByIdAsync(id);
-        if (receipt == null)
+        // ✅ GET: api/receipt → Fetch all receipts
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Receipt>>> GetAllReceipts()
         {
-            return NotFound();
+            return Ok(await _receiptService.GetAllReceiptsAsync());
         }
 
-        await _receiptRepository.DeleteAsync(id);
-        return NoContent();
+        // ✅ POST: api/receipt → Create a new receipt
+        [HttpPost]
+        public async Task<ActionResult> AddReceipt([FromBody] Receipt receipt)
+        {
+            await _receiptService.AddReceiptAsync(receipt);
+            return CreatedAtAction(nameof(GetReceiptById), new { id = receipt.ReceiptId }, receipt);
+        }
+
+        // ✅ PUT: api/receipt/{id} → Update a receipt
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateReceipt(int id, [FromBody] Receipt receipt)
+        {
+            if (id != receipt.ReceiptId)
+                return BadRequest();
+
+            await _receiptService.UpdateReceiptAsync(receipt);
+            return NoContent();
+        }
+
+        // ✅ DELETE: api/receipt/{id} → Delete a receipt
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteReceipt(int id)
+        {
+            await _receiptService.DeleteReceiptAsync(id);
+            return NoContent();
+        }
     }
 }
