@@ -1,11 +1,37 @@
-﻿namespace NCFApi.Domain.DTOs
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace NCFApi.Domain.DTOs;
+
+public class ReceiptDto
 {
-    public class ReceiptDto
-    {
-        public int Id { get; set; }  // Unique Identifier
-        public required int TransactionId { get; set; }  // Foreign Key referencing Transaction
-        public required DateTime IssuedDate { get; set; }  // Timestamp of issuance
-        public required string ReceiptNumber { get; set; }  // Unique identifier for the receipt
-        public required string IssuedBy { get; set; }  // Name of the issuer or organization
-    }
+    public int ReceiptId { get; set; }
+
+    [Required]
+    public int DonationId { get; set; }
+
+    [Required]
+    public int DonorId { get; set; }
+
+    [Required]
+    public int OrganizationId { get; set; }
+
+    [Required]
+    public int PaymentMethodId { get; set; }
+
+    [Required]
+    public int StatusId { get; set; }
+
+    [Required]
+    public DateTime IssuedDate { get; set; } = DateTime.UtcNow;
+
+    [Required]
+    [StringLength(50)]
+    public string ReceiptNumber { get; set; }
+
+    [Required]
+    [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+    public decimal Amount { get; set; }
+
+    public string Notes { get; set; }
 }

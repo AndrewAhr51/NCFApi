@@ -31,15 +31,15 @@ namespace NCFApi.Application.Services
             };
 
             var createdUser = await _userRepository.AddAsync(newUser);
-            return new UserDto { Id = createdUser.Id, Username = createdUser.Username, Email = createdUser.Email, Role = createdUser.RoleId };
+            return new UserDto { UserId = createdUser.UserId, Username = createdUser.Username, Email = createdUser.Email, Role = createdUser.RoleId };
         }
 
         // ✅ Retrieve a user by ID
-        public async Task<UserDto?> GetUserByIdAsync(int id)
+        public async Task<UserDto?> GetUserByIdAsync(int userId)
         {
-            var user = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null) return null;
-            return new UserDto { Id = user.Id, Username = user.Username, Email = user.Email, Role = user.RoleId };
+            return new UserDto { UserId = user.UserId, Username = user.Username, Email = user.Email, Role = user.RoleId };
         }
 
         // ✅ Update user details

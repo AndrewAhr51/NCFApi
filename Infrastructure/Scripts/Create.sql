@@ -5,7 +5,7 @@ GO
 
 -- 🔹 Create Roles Table
 CREATE TABLE Roles (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+    RoleId INT PRIMARY KEY IDENTITY(1,1),
     Name NVARCHAR(50) NOT NULL UNIQUE,
     Description NVARCHAR(255) NULL
 );
@@ -13,7 +13,7 @@ GO
 
 -- 🔹 Create Permissions Table
 CREATE TABLE Permissions (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+    PermissionId INT PRIMARY KEY IDENTITY(1,1),
     Name NVARCHAR(100) NOT NULL UNIQUE,
     Description NVARCHAR(255) NULL
 );
@@ -21,11 +21,11 @@ GO
 
 -- 🔹 Create RolePermissions Table
 CREATE TABLE RolePermissions (
-    RoleId INT NOT NULL,
+    RolePermissionId INT NOT NULL,
     PermissionId INT NOT NULL,
-    PRIMARY KEY (RoleId, PermissionId),
-    FOREIGN KEY (RoleId) REFERENCES Roles(Id) ON DELETE CASCADE,
-    FOREIGN KEY (PermissionId) REFERENCES Permissions(Id) ON DELETE CASCADE
+    PRIMARY KEY (RolePermissionId, PermissionId),
+    FOREIGN KEY (RolePermissionId) REFERENCES Roles(RoleId) ON DELETE CASCADE,
+    FOREIGN KEY (PermissionId) REFERENCES Permissions(PermissionId) ON DELETE CASCADE
 );
 GO
 
@@ -38,21 +38,9 @@ CREATE TABLE Users (
     RoleId INT NOT NULL,
     CreatedAt DATETIME DEFAULT GETUTCDATE(),
     UpdatedAt DATETIME DEFAULT GETUTCDATE(),
-    FOREIGN KEY (RoleId) REFERENCES Roles(Id) ON DELETE CASCADE
+    FOREIGN KEY (RoleId) REFERENCES Roles(RoleId) ON DELETE CASCADE
 );
 GO
-
--- 🔹 Create SystemUsers Table
-CREATE TABLE SystemUsers (
-    SystemUserId INT PRIMARY KEY,
-    Username NVARCHAR(255),
-    Email NVARCHAR(255),
-    PasswordHash NVARCHAR(255),
-    RoleId INT,
-    FOREIGN KEY (RoleId) REFERENCES Roles(Id)
-);
-GO
-
 -- 🔹 Create Donors Table
 CREATE TABLE Donors (
     DonorId INT PRIMARY KEY IDENTITY(1,1),
@@ -73,37 +61,46 @@ CREATE TABLE Donors (
     FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE
 );
 GO
+
+-- 🔹 Create CharitableOrganizations Table
+CREATE TABLE CharitableOrganizations (
+    OrganizationId INT PRIMARY KEY IDENTITY(1,1),  -- ✅ Unique ID (Auto Increment)
+    Name NVARCHAR(255) NOT NULL,                   -- ✅ Organization Name
+    Description NVARCHAR(MAX),                      -- ✅ Brief Description
+    RegistrationNumber NVARCHAR(50) UNIQUE NOT NULL, -- ✅ Legal Registration Number
+    Website NVARCHAR(255),                          -- ✅ Website URL
+    ContactEmail NVARCHAR(255) UNIQUE,              -- ✅ Contact Email
+    ContactPhone NVARCHAR(20),                      -- ✅ Contact Phone
+    Address NVARCHAR(255),                          -- ✅ Physical Address
+    City NVARCHAR(100),                             -- ✅ City
+    State NVARCHAR(100),                            -- ✅ State / Region
+    Country NVARCHAR(100),                          -- ✅ Country
+    PostalCode NVARCHAR(20),                        -- ✅ ZIP / Postal Code
+    FoundedYear INT,                                -- ✅ Year Founded
+    TotalDonations DECIMAL(18,2),                   -- ✅ Total Donation Received
+    IsActive BIT DEFAULT 1,                         -- ✅ Organization Status (Active/Inactive)
+    CreatedAt DATETIME DEFAULT GETDATE(),           -- ✅ Record Created Timestamp
+    UpdatedAt DATETIME DEFAULT GETDATE()            -- ✅ Last Update Timestamp
+);
+
 GO
 
--- 🔹 Create Transactions Table
-CREATE TABLE Transactions (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    DonorId INT NOT NULL,
-    Amount DECIMAL(18,2) NOT NULL,
-    TransactionDate DATETIME DEFAULT GETDATE(),
-    PaymentMethod NVARCHAR(50) NOT NULL,
-    Status NVARCHAR(20) NOT NULL,
-    ReferenceNumber NVARCHAR(50) UNIQUE NOT NULL,
-    FOREIGN KEY (DonorId) REFERENCES Donors(DonorId) ON DELETE CASCADE
+-- 🔹 Create Donations Table
+CREATE TABLE Donations (
+    DonationId INT PRIMARY KEY IDENTITY(1,1),  -- ✅ Unique Donation ID
+    DonorId INT NOT NULL,  -- ✅ Links to Donors table
+    OrganizationId INT NOT NULL,  -- ✅ Links to CharitableOrganizations table
+    Amount DECIMAL(18,2) NOT NULL,  -- ✅ Donation amount
+    DonationDate DATETIME DEFAULT GETDATE(),  -- ✅ Timestamp of donation
+    PaymentMethod NVARCHAR(50) NOT NULL,  -- ✅ Payment method (Credit Card, PayPal, etc.)
+    TransactionReference NVARCHAR(100) UNIQUE NOT NULL,  -- ✅ Unique transaction ID
+    Status NVARCHAR(20) DEFAULT 'Completed',  -- ✅ Payment Status (Completed, Pending, Failed)
+    Notes NVARCHAR(MAX),  -- ✅ Optional notes about the donation
+    
+    -- 🔹 Foreign Key Relationships
+    FOREIGN KEY (DonorId) REFERENCES Donors(DonorId) ON DELETE CASCADE,
+    FOREIGN KEY (OrganizationId) REFERENCES CharitableOrganizations(OrganizationId) ON DELETE CASCADE
 );
-GO
-
--- 🔹 Create Campaigns Table
-CREATE TABLE Campaigns (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    Name NVARCHAR(255) NOT NULL,
-    StartDate DATE NOT NULL,
-    EndDate DATE NOT NULL
-);
-GO
-
--- 🔹 Create Organizations Table
-CREATE TABLE Organizations (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    Name NVARCHAR(255) NOT NULL,
-    ContactEmail NVARCHAR(255) UNIQUE NOT NULL
-);
-GO
 
 -- 🔹 Create PaymentMethods Table
 CREATE TABLE PaymentMethods (
@@ -114,18 +111,52 @@ CREATE TABLE PaymentMethods (
 );
 GO
 
--- 🔹 Create Receipts Table
-CREATE TABLE Receipts (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    TransactionId INT NOT NULL,
-    IssuedDate DATETIME DEFAULT GETDATE(),
-    ReceiptNumber NVARCHAR(50) UNIQUE NOT NULL,
-    FOREIGN KEY (TransactionId) REFERENCES Transactions(Id) ON DELETE CASCADE
+-- 🔹 Create ReceiptStatuses Table
+CREATE TABLE ReceiptStatuses (
+    StatusId INT PRIMARY KEY IDENTITY(1,1),  -- ✅ Unique ID for each status
+    StatusName NVARCHAR(50) NOT NULL UNIQUE,  -- ✅ Standardized status name
+    Description NVARCHAR(255) NOT NULL  -- ✅ Additional details about the status
 );
 GO
-
--- ✅ Create Indexes for Faster Queries
-CREATE INDEX IX_Donors_Email ON Donors(Email);
-CREATE INDEX IX_Transactions_ReferenceNumber ON Transactions(ReferenceNumber);
-CREATE INDEX IX_Users_Username ON Users(Username);
+-- 🔹 Create Receipts Table
+CREATE TABLE Receipts (
+    ReceiptId INT PRIMARY KEY IDENTITY(1,1),  
+    DonationId INT NOT NULL,  
+    DonorId INT NOT NULL,  
+    OrganizationId INT NOT NULL,  
+    PaymentMethodId INT NOT NULL,  
+    StatusId INT NOT NULL,  -- ✅ Links to ReceiptStatuses table
+    IssuedDate DATETIME DEFAULT GETDATE(),  
+    ReceiptNumber NVARCHAR(50) UNIQUE NOT NULL,  
+    Amount DECIMAL(18,2) NOT NULL,  
+    Notes NVARCHAR(MAX),  
+    
+    -- 🔹 Foreign Key Relationships
+    FOREIGN KEY (DonationId) REFERENCES Donations(DonationId),
+    FOREIGN KEY (DonorId) REFERENCES Donors(DonorId),
+    FOREIGN KEY (OrganizationId) REFERENCES CharitableOrganizations(OrganizationId),
+    FOREIGN KEY (PaymentMethodId) REFERENCES PaymentMethods(Id),
+    FOREIGN KEY (StatusId) REFERENCES ReceiptStatuses(StatusId)
+);
 GO
+-- ✅ Index for faster donor lookup
+CREATE INDEX IDX_Donors_Email ON Donors(Email);
+CREATE INDEX IDX_Donors_UserId ON Donors(UserId);
+
+-- ✅ Index for quick organization searches
+CREATE INDEX IDX_CharitableOrganizations_RegistrationNumber ON CharitableOrganizations(RegistrationNumber);
+CREATE INDEX IDX_CharitableOrganizations_Name ON CharitableOrganizations(Name);
+
+-- ✅ Index for efficient donation tracking
+CREATE INDEX IDX_Donations_DonorId ON Donations(DonorId);
+CREATE INDEX IDX_Donations_OrganizationId ON Donations(OrganizationId);
+CREATE INDEX IDX_Donations_TransactionReference ON Donations(TransactionReference);
+
+-- ✅ Index for fast receipts retrieval
+CREATE INDEX IDX_Receipts_ReceiptNumber ON Receipts(ReceiptNumber);
+
+-- ✅ Index for payment method efficiency
+CREATE INDEX IDX_PaymentMethods_MethodName ON PaymentMethods(MethodName);
+
+-- ✅ Index for receipt status filtering
+CREATE INDEX IDX_ReceiptStatuses_StatusName ON ReceiptStatuses(StatusName);

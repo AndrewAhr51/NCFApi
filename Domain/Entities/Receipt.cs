@@ -1,16 +1,53 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NCFApi.Domain.Entities
 {
     public class Receipt
     {
-        public int Id { get; set; }  // Unique Identifier
-        public required int TransactionId { get; set; }  // Foreign Key referencing Transaction
-        public required DateTime IssuedDate { get; set; } = DateTime.UtcNow;  // Timestamp of issuance
-        public required string ReceiptNumber { get; set; }  // Unique Receipt Identifier
-        public required string IssuedBy { get; set; }  // Name of the issuer or organization
+        [Key]
+        public int ReceiptId { get; set; }
 
-        // ✅ Navigation Property
-        public required Transaction Transaction { get; set; }
+        [Required]
+        [ForeignKey("Donation")]
+        public int DonationId { get; set; }
+
+        [Required]
+        [ForeignKey("Donor")]
+        public int DonorId { get; set; }
+
+        [Required]
+        [ForeignKey("CharitableOrganization")]
+        public int OrganizationId { get; set; }
+
+        [Required]
+        [ForeignKey("PaymentMethod")]
+        public int PaymentMethodId { get; set; }
+
+        [Required]
+        [ForeignKey("ReceiptStatus")]
+        public int StatusId { get; set; }
+
+        [Required]
+        public DateTime IssuedDate { get; set; } = DateTime.UtcNow;
+
+        [Required]
+        [StringLength(50)]
+        public string ReceiptNumber { get; set; }
+
+        [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+        public decimal Amount { get; set; }
+
+        public string Notes { get; set; }
+
+        // Navigation Properties
+        public virtual Donation Donation { get; set; }
+        public virtual Donor Donor { get; set; }
+        public virtual CharitableOrganization CharitableOrganization { get; set; }
+        public virtual PaymentMethod PaymentMethod { get; set; }
+        public virtual ReceiptStatus ReceiptStatus { get; set; }
     }
+
 }

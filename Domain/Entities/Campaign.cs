@@ -13,6 +13,6 @@ namespace NCFApi.Domain.Entities
         public required decimal GoalAmount { get; set; }  // Fundraising Target
 
         // ✅ Navigation Properties
-        public required ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public required ICollection<Donation> Transactions { get; set; } = new List<Donation>();
     }
 }

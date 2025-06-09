@@ -1,4 +1,4 @@
-﻿namespace NCFApi.Application.DTOs
+﻿namespace NCFApi.Domain.DTOs
 {
     public class LoginDto
     {
