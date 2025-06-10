@@ -2,6 +2,6 @@
 {
     public class RefreshTokenRequest
     {
-        public string ExpiredToken { get; set; }
+        public string ExpiredToken { get; set; } = string.Empty; // ✅ Defaults to empty string
     }
 }

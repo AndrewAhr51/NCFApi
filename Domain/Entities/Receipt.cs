@@ -34,20 +34,12 @@ namespace NCFApi.Domain.Entities
 
         [Required]
         [StringLength(50)]
-        public string ReceiptNumber { get; set; }
+        public string ReceiptNumber { get; set; } = string.Empty; // ✅ Defaults to empty string
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
         public decimal Amount { get; set; }
 
-        public string Notes { get; set; }
-
-        // Navigation Properties
-        public virtual Donation Donation { get; set; }
-        public virtual Donor Donor { get; set; }
-        public virtual CharitableOrganization CharitableOrganization { get; set; }
-        public virtual PaymentMethod PaymentMethod { get; set; }
-        public virtual ReceiptStatus ReceiptStatus { get; set; }
+        public string Notes { get; set; } = string.Empty; // ✅ Defaults to empty string
     }
-
 }

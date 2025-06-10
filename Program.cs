@@ -12,11 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Configure SQL Server Database Context
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("NCFConnection") ??
-        throw new InvalidOperationException("Database connection string is missing."),
-        sqlOptions => sqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
-    ));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("NCFConnection")));
 
 // ✅ Register Repositories & Services (Removed Duplicate UserRepository & UserService)
 builder.Services.AddScoped<IUserRepository, UserRepository>();

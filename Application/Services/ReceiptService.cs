@@ -1,82 +1,42 @@
-﻿using NCFApi.Domain.DTOs;
-using NCFApi.Domain.Entities;
+﻿using NCFApi.Domain.Entities;
 using NCFApi.Infrastructure.Repositories;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace NCFApi.Application.Services;
-
-public class ReceiptService : IReceiptService
+namespace NCFApi.Application.Services
 {
-    private readonly IReceiptRepository _receiptRepository;
-
-    public ReceiptService(IReceiptRepository receiptRepository)
+    public class ReceiptService : IReceiptService
     {
-        _receiptRepository = receiptRepository;
-    }
+        private readonly IReceiptRepository _receiptRepository;
 
-    public async Task<IEnumerable<ReceiptDto>> GetAllAsync()
-    {
-        var receipts = await _receiptRepository.GetAllAsync();
-        return receipts.Select(r => MapToDto(r));
-    }
-
-    public async Task<ReceiptDto> GetByIdAsync(int receiptId)
-    {
-        var receipt = await _receiptRepository.GetByIdAsync(receiptId);
-        return receipt != null ? MapToDto(receipt) : null;
-    }
-
-    public async Task AddAsync(ReceiptDto receiptDto)
-    {
-        var receipt = new Receipt
+        public ReceiptService(IReceiptRepository receiptRepository)
         {
-            DonationId = receiptDto.DonationId,
-            DonorId = receiptDto.DonorId,
-            OrganizationId = receiptDto.OrganizationId,
-            PaymentMethodId = receiptDto.PaymentMethodId,
-            StatusId = receiptDto.StatusId,
-            IssuedDate = receiptDto.IssuedDate,
-            ReceiptNumber = receiptDto.ReceiptNumber,
-            Amount = receiptDto.Amount,
-            Notes = receiptDto.Notes
-        };
+            _receiptRepository = receiptRepository;
+        }
 
-        await _receiptRepository.AddAsync(receipt);
-    }
-
-    public async Task UpdateAsync(int receiptId, ReceiptDto receiptDto)
-    {
-        var existingReceipt = await _receiptRepository.GetByIdAsync(receiptId);
-        if (existingReceipt == null) return;
-
-        existingReceipt.StatusId = receiptDto.StatusId;
-        existingReceipt.Notes = receiptDto.Notes;
-        existingReceipt.Amount = receiptDto.Amount;
-
-        await _receiptRepository.UpdateAsync(existingReceipt);
-    }
-
-    public async Task DeleteAsync(int receiptId)
-    {
-        await _receiptRepository.DeleteAsync(receiptId);
-    }
-
-    private ReceiptDto MapToDto(Receipt receipt)
-    {
-        return new ReceiptDto
+        public async Task<Receipt?> GetReceiptByIdAsync(int id)
         {
-            ReceiptId = receipt.ReceiptId,
-            DonationId = receipt.DonationId,
-            DonorId = receipt.DonorId,
-            OrganizationId = receipt.OrganizationId,
-            PaymentMethodId = receipt.PaymentMethodId,
-            StatusId = receipt.StatusId,
-            IssuedDate = receipt.IssuedDate,
-            ReceiptNumber = receipt.ReceiptNumber,
-            Amount = receipt.Amount,
-            Notes = receipt.Notes
-        };
+            return await _receiptRepository.GetReceiptByIdAsync(id);
+        }
+
+        public async Task<IEnumerable<Receipt>> GetAllReceiptsAsync()
+        {
+            return await _receiptRepository.GetAllReceiptsAsync();
+        }
+
+        public async Task AddReceiptAsync(Receipt receipt)
+        {
+            await _receiptRepository.AddReceiptAsync(receipt);
+        }
+
+        public async Task UpdateReceiptAsync(Receipt receipt)
+        {
+            await _receiptRepository.UpdateReceiptAsync(receipt);
+        }
+
+        public async Task DeleteReceiptAsync(int id)
+        {
+            await _receiptRepository.DeleteReceiptAsync(id);
+        }
     }
 }

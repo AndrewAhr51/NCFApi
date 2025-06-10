@@ -1,53 +1,65 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using NCFApi.Domain.Entities;
 using NCFApi.Application.Services;
-using NCFApi.Domain.DTOs;
-using System.Security.Claims;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
-[Route("api/donors")]
-[ApiController]
-[Authorize] // ✅ Any authenticated user can access the API
-public class DonorController : ControllerBase
+namespace NCFApi.Controllers
 {
-    private readonly IDonorService _donorService;
-
-    public DonorController(IDonorService donorService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class DonorController : ControllerBase
     {
-        _donorService = donorService;
-    }
+        private readonly IDonorService _donorService;
 
-    // ✅ Get donor profile (Authenticated users can access)
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetDonorProfile(int id)
-    {
-        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-
-        // ✅ Allow self-access OR Admin override
-        var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        if (id != currentUserId && currentUserRole != "Admin")
+        public DonorController(IDonorService donorService)
         {
-            return Forbid(); // ❌ Prevents unauthorized access
+            _donorService = donorService;
         }
 
-        var donor = await _donorService.GetByIdAsync(id);
-        return donor != null ? Ok(donor) : NotFound();
-    }
-
-    // ✅ Update donor profile (Only self-update unless Admin)
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateDonorProfile(int id, [FromBody] UpdateDonorDto donorDto)
-    {
-        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-        var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
-        // ✅ Allow self-updates OR Admin updates
-        if (id != currentUserId && currentUserRole != "Admin")
+        // ✅ GET: api/donor/{id} → Fetch a single donor
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Donor>> GetDonorById(int id)
         {
-            return Forbid(); // ❌ Prevents unauthorized updates
+            var donor = await _donorService.GetDonorByIdAsync(id);
+            if (donor == null)
+                return NotFound();
+
+            return Ok(donor);
         }
 
-        var updated = await _donorService.UpdateDonorProfileAsync(id, donorDto, currentUserId);
-        return updated ? NoContent() : NotFound();
+        // ✅ GET: api/donor → Fetch all donors
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Donor>>> GetAllDonors()
+        {
+            return Ok(await _donorService.GetAllDonorsAsync());
+        }
+
+        // ✅ POST: api/donor → Create a new donor
+        [HttpPost]
+        public async Task<ActionResult> AddDonor([FromBody] Donor donor)
+        {
+            await _donorService.AddDonorAsync(donor);
+            return CreatedAtAction(nameof(GetDonorById), new { id = donor.DonorId }, donor);
+        }
+
+        // ✅ PUT: api/donor/{id} → Update a donor
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateDonor(int id, [FromBody] Donor donor)
+        {
+            if (id != donor.DonorId)
+                return BadRequest();
+
+            await _donorService.UpdateDonorAsync(donor);
+            return NoContent();
+        }
+
+        // ✅ DELETE: api/donor/{id} → Delete a donor
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteDonor(int id)
+        {
+            await _donorService.DeleteDonorAsync(id);
+            return NoContent();
+        }
     }
 }

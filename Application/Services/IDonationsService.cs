@@ -1,16 +1,15 @@
-﻿using NCFApi.Domain.DTOs;
+﻿using NCFApi.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NCFApi.Application.Services;
-
-public interface IDonationService
+namespace NCFApi.Application.Services
 {
-    Task<IEnumerable<DonationDto>> GetAllAsync();
-    Task<DonationDto> GetByIdAsync(int donationId);
-    Task<IEnumerable<DonationDto>> GetByDonorIdAsync(int donorId);
-    Task<IEnumerable<DonationDto>> GetByOrganizationIdAsync(int organizationId);
-    Task AddAsync(DonationDto donationDto);
-    Task UpdateAsync(int donationId, DonationDto donationDto);
-    Task DeleteAsync(int donationId);
+    public interface IDonationService
+    {
+        Task<Donation?> GetDonationByIdAsync(int id);
+        Task<IEnumerable<Donation>> GetAllDonationsAsync();
+        Task AddDonationAsync(Donation donation);
+        Task UpdateDonationAsync(Donation donation);
+        Task DeleteDonationAsync(int id);
+    }
 }

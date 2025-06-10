@@ -1,50 +1,58 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace NCFApi.Domain.DTOs;
-
-public class CharitableOrganizationDto
+namespace NCFApi.Application.DTOs
 {
-    public int OrganizationId { get; set; }
+    public class CharitableOrganizationDto
+    {
+        [Required]
+        public int OrganizationId { get; set; }
 
-    [Required]
-    [StringLength(255)]
-    public string Name { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string Name { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(int.MaxValue)]
-    public string Description { get; set; }
+        [StringLength(500)]
+        public string Description { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [Required]
-    [StringLength(50)]
-    public string RegistrationNumber { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string RegistrationNumber { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(255)]
-    public string Website { get; set; }
+        [Url]
+        public string Website { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(255)]
-    public string ContactEmail { get; set; }
+        [Required]
+        [EmailAddress]
+        public string ContactEmail { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(20)]
-    public string ContactPhone { get; set; }
+        [Phone]
+        public string ContactPhone { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(255)]
-    public string Address { get; set; }
+        [StringLength(255)]
+        public string Address { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(100)]
-    public string City { get; set; }
+        [StringLength(100)]
+        public string City { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(100)]
-    public string State { get; set; }
+        [StringLength(100)]
+        public string State { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(100)]
-    public string Country { get; set; }
+        [StringLength(100)]
+        public string Country { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    [StringLength(20)]
-    public string PostalCode { get; set; }
+        [StringLength(20)]
+        public string PostalCode { get; set; } = string.Empty; // ✅ Defaults to empty string
 
-    public int? FoundedYear { get; set; }
+        public int FoundedYear { get; set; }
 
-    [Range(0, double.MaxValue)]
-    public decimal? TotalDonations { get; set; }
+        [Range(0, double.MaxValue)]
+        public decimal TotalDonations { get; set; }
 
-    public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime UpdatedAt { get; set; }
+    }
 }
