@@ -34,13 +34,12 @@ namespace NCFApi.Domain.Entities
 
         [Required]
         [StringLength(50)]
-        public string ReceiptNumber { get; set; }
+        public string ReceiptNumber { get; set; } = string.Empty; // ✅ Defaults to empty string
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
         public decimal Amount { get; set; }
 
-        public string Notes { get; set; }
+        public string Notes { get; set; } = string.Empty; // ✅ Defaults to empty string
     }
-
 }

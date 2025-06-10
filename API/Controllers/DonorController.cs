@@ -40,14 +40,14 @@ namespace NCFApi.Controllers
         public async Task<ActionResult> AddDonor([FromBody] Donor donor)
         {
             await _donorService.AddDonorAsync(donor);
-            return CreatedAtAction(nameof(GetDonorById), new { id = donor.DonerId }, donor);
+            return CreatedAtAction(nameof(GetDonorById), new { id = donor.DonorId }, donor);
         }
 
         // ✅ PUT: api/donor/{id} → Update a donor
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateDonor(int id, [FromBody] Donor donor)
         {
-            if (id != donor.DonerId)
+            if (id != donor.DonorId)
                 return BadRequest();
 
             await _donorService.UpdateDonorAsync(donor);
